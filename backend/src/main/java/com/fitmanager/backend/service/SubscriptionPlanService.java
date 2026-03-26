@@ -1,5 +1,6 @@
 package com.fitmanager.backend.service;
 
+import com.fitmanager.backend.dto.SubscriptionPlanDTO;
 import com.fitmanager.backend.model.Gym;
 import com.fitmanager.backend.model.SubscriptionPlan;
 import com.fitmanager.backend.repository.GymRepository;
@@ -17,11 +18,17 @@ public class SubscriptionPlanService {
     @Autowired
     private GymRepository gymRepository;
 
-    public SubscriptionPlan savePlan(SubscriptionPlan plan, Long gymId) {
+    public SubscriptionPlan savePlan(SubscriptionPlanDTO dto, Long gymId) {
         Gym gym = gymRepository.findById(gymId)
                 .orElseThrow(() -> new RuntimeException("Gimnasio no encontrado"));
 
+        SubscriptionPlan plan = new SubscriptionPlan();
+        plan.setName(dto.getName());
+        plan.setPrice(dto.getPrice());
+        plan.setDurationDays(dto.getDurationDays());
+        plan.setDescription(dto.getDescription());
         plan.setGym(gym);
+
         return planRepository.save(plan);
     }
 

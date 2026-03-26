@@ -2,13 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { createMember, updateMember } from './services/memberService';
 import { getPlansByGym } from './services/planService';
 
+const getTodayDate = () => {
+  const hoy = new Date();
+  // Esto ajusta la fecha a tu zona horaria local antes de convertirla a string
+  const offset = hoy.getTimezoneOffset() * 60000;
+  const localISOTime = (new Date(hoy - offset)).toISOString().split('T')[0];
+  return localISOTime; // Retorna "2026-03-25" exacto
+};
+
 function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     dni: '',
     email: '',
-    subscriptionPlanId: ''
+    subscriptionPlanId: '',
+    registrationDate: getTodayDate() // <-- Fecha por defecto
   });
   const [planes, setPlanes] = useState([]);
 
@@ -32,11 +41,19 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
     if (socioAEditar) {
       setFormData({
         ...socioAEditar,
-        // Si el socio ya tiene un plan, extraemos el ID para el select
-        subscriptionPlanId: socioAEditar.subscriptionPlan?.id || ''
+        subscriptionPlanId: socioAEditar.subscriptionPlan?.id || '',
+        // Si el socio ya tiene fecha, la usamos, sino hoy
+        registrationDate: socioAEditar.registrationDate || getTodayDate()
       });
     } else {
-      setFormData({ firstName: '', lastName: '', dni: '', email: '', subscriptionPlanId: '' });
+      setFormData({
+        firstName: '',
+        lastName: '',
+        dni: '',
+        email: '',
+        subscriptionPlanId: '',
+        registrationDate: getTodayDate() // <-- Reset a hoy
+      });
     }
   }, [socioAEditar, isOpen]);
 
@@ -105,6 +122,18 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
             onChange={(e) => setFormData({...formData, dni: e.target.value})}
             required
           />
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-slate-400 ml-1">Fecha de Ingreso</label>
+            <input
+              type="date"
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              value={formData.registrationDate}
+              onChange={(e) => setFormData({...formData, registrationDate: e.target.value})}
+              required
+            />
+          </div>
+
           <input
             type="email" placeholder="Email"
             className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 text-white"

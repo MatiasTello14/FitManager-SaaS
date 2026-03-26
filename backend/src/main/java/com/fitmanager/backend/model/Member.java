@@ -3,6 +3,8 @@ package com.fitmanager.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+
+
 import java.time.LocalDate;
 
 @Data
@@ -32,4 +34,7 @@ public class Member {
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private SubscriptionPlan subscriptionPlan; // El socio tiene un plan contratado
+
+    @Transient
+    private LocalDate lastPaymentDate;
 }

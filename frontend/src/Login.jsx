@@ -13,8 +13,27 @@ const manejarLogin = async (e) => {
     setMensaje("Cargando...");
     try {
       const response = await login(email, password);
-      console.log("Respuesta del servidor:", response); // <-- AGREGÁ ESTO PARA VER QUÉ LLEGA
-      navigate('/dashboard'); // <-- ESTO ES LO QUE TE MUEVE DE PÁGINA
+
+      // LA CLAVE ESTÁ ACÁ:
+      // Si tu backend ahora devuelve el objeto AuthResponse que planeamos:
+      // response.token, response.gymId, etc.
+
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+      }
+
+      if (response.gymId) {
+        localStorage.setItem('gymId', response.gymId);
+        console.log("Gym ID guardado:", response.gymId);
+      }
+
+      setMensaje("✅ ¡Bienvenido!");
+
+      // Un pequeño delay para que el usuario vea el mensaje de éxito
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
+
     } catch (error) {
       console.error("Error en login:", error);
       setMensaje("❌ Credenciales incorrectas");

@@ -1,13 +1,17 @@
 package com.fitmanager.backend.config;
 
+import com.fitmanager.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,6 +28,24 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
 
+    @Autowired
+    private UserRepository userRepository; // Necesitamos el repo para el UserDetailsService
+
+    // 🔴 ESTO ES LO QUE TE FALTABA: Definir cómo buscar al usuario
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -31,21 +53,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 🔓 Públicos
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/members/**").permitAll() //esto se borra a lo ultimo , es para prueba y no usar token a cada rato
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
 
-                        // 🔒 PRIVADO: Solo el dueño del gimnasio (ADMIN)
-                        .requestMatchers("/api/gyms/**").hasRole("ADMIN")
-                        .requestMatchers("/api/members/gym/**").hasRole("ADMIN") // Ver todos los socios
-                        .requestMatchers("/api/plans/**").permitAll()
+                        // 🏋️‍♂️ Planes: Vamos a dejarlos autenticados para todos por ahora para que funcione
+                        .requestMatchers("/api/plans/**").authenticated()
 
-                        // 🔓 COMPARTIDO: Admin y Socios
-                        .requestMatchers("/api/plans/gym/**").hasAnyRole("ADMIN", "MEMBER")
-                        .requestMatchers("/api/payments/member/**").hasAnyRole("ADMIN", "MEMBER")
+                        // 👥 Socios (Tu permiso temporal de prueba)
+                        .requestMatchers("/api/members/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
+                // 🔴 AGREGAMOS EL PROVIDER
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -64,7 +85,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // La URL de Vite/React
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

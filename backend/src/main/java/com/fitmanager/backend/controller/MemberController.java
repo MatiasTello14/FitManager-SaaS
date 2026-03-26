@@ -1,12 +1,16 @@
 package com.fitmanager.backend.controller;
 
+import com.fitmanager.backend.dto.MemberDTO;
+import com.fitmanager.backend.mapper.MemberMapper;
 import com.fitmanager.backend.model.Member;
 import com.fitmanager.backend.service.MemberService;
+import jakarta.validation.Valid; // Importante
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/members")
@@ -16,36 +20,43 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
+    @Autowired
+    private MemberMapper memberMapper;
+
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Member member,
+    public ResponseEntity<?> create(@Valid @RequestBody MemberDTO memberDto,
                                     @RequestParam Long gymId,
                                     @RequestParam Long planId) {
         try {
-            Member newMember = memberService.createMember(member, gymId, planId);
-            return ResponseEntity.ok(newMember);
+            // El Service ahora recibe el DTO validado
+            Member newMember = memberService.createMember(memberDto, gymId, planId);
+            return ResponseEntity.ok(memberMapper.toDTO(newMember));
         } catch (RuntimeException e) {
-            // Devolvemos el mensaje de la excepción para que React lo muestre en el alert
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/gym/{gymId}")
-    public List<Member> list(@PathVariable Long gymId) {
-        return memberService.getAllByGym(gymId);
+    public List<MemberDTO> list(@PathVariable Long gymId) {
+        List<Member> members = memberService.getAllByGym(gymId);
+        return members.stream()
+                .map(memberMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/{id}/status")
-    @CrossOrigin(origins = "http://localhost:5173")
-    public Member updateStatus(@PathVariable Long id) {
-        return memberService.toggleStatus(id);
+    public ResponseEntity<MemberDTO> updateStatus(@PathVariable Long id) {
+        Member updated = memberService.toggleStatus(id);
+        return ResponseEntity.ok(memberMapper.toDTO(updated));
     }
 
     @PutMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:5173")
-    public Member updateMember(
+    public ResponseEntity<MemberDTO> updateMember(
             @PathVariable Long id,
-            @RequestBody Member memberDetails,
-            @RequestParam(required = false) Long planId) { // Agregamos el planId opcional
-        return memberService.updateMember(id, memberDetails, planId);
+            @Valid @RequestBody MemberDTO memberDto,
+            @RequestParam(required = false) Long planId) {
+
+        Member updatedMember = memberService.updateMember(id, memberDto, planId);
+        return ResponseEntity.ok(memberMapper.toDTO(updatedMember));
     }
 }
