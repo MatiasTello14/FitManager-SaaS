@@ -2,12 +2,14 @@
 
 FitManager es una solución **Full Stack** diseñada para digitalizar la administración de gimnasios. Permite a los dueños controlar el flujo de caja, gestionar la morosidad de socios en tiempo real y administrar planes de suscripción de forma dinámica con una arquitectura escalable.
 
+
+### 🔐 Registro de nuevos Gimnasios
+
+> https://github.com/user-attachments/assets/8891064c-78e3-4e01-9b4b-5fae1812fd9e
+
 ## 📺 Demo Visual
 
-> [!IMPORTANT]
-> **Mira el video de funcionamiento completo (2:36 min) haciendo clic abajo:**
->
-> [INSERTAR_VIDEO_AQUÍ]
+>  https://github.com/user-attachments/assets/6c9dc1d5-3cfd-4781-bcf1-5b58e16c1411
 
 ---
 
