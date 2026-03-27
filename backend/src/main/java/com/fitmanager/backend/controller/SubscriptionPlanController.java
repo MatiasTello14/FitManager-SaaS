@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/plans")
-@CrossOrigin(origins = "http://localhost:5173")
+
 public class SubscriptionPlanController {
 
     @Autowired
