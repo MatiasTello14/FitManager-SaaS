@@ -5,7 +5,6 @@ FitManager es una solución **Full Stack** diseñada para digitalizar la adminis
 ## 📺 Demo Visual
 
 > [!IMPORTANT]
-> **Mira el video de funcionamiento completo (2:36 min) haciendo clic abajo:**
 >
 >  https://github.com/user-attachments/assets/8bb34fcf-a615-48f5-94af-b3393c5c8828
 
