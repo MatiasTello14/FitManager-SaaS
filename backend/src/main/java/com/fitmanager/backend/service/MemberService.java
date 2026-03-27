@@ -72,14 +72,8 @@ public class MemberService {
     }
 
     public List<Member> getAllByGym(Long gymId) {
-        List<Member> members = memberRepository.findByGymId(gymId);
-        for (Member m : members) {
-            List<Payment> payments = paymentRepository.findByMemberIdOrderByPaymentDateDesc(m.getId());
-            if (!payments.isEmpty()) {
-                m.setLastPaymentDate(payments.get(0).getPaymentDate().toLocalDate());
-            }
-        }
-        return members;
+        // Esto trae los socios con la fecha que tengan guardada en su columna
+        return memberRepository.findByGymId(gymId);
     }
 
     public Member toggleStatus(Long id) {

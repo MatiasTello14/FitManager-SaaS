@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/members";
+import { API_BASE_URL } from '../config';
+
+const API_URL = `${API_BASE_URL}/members`;
 
 export const getMembersByGym = async (gymId) => {
     try {
-        // Por ahora no mandamos token porque pusimos .permitAll()
         const response = await axios.get(`${API_URL}/gym/${gymId}`);
         return response.data;
     } catch (error) {
@@ -34,7 +35,7 @@ export const toggleMemberStatus = async (id) => {
 };
 
 export const updateMember = async (id, memberData) => {
-    // Usamos params para enviar el planId por la URL
+
     const response = await axios.put(`${API_URL}/${id}`, memberData, {
         params: { planId: memberData.subscriptionPlanId }
     });

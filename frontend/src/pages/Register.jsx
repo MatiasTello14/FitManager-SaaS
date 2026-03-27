@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { registerGym } from './services/authService';
+import { registerGym } from '../services/authService';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -22,8 +22,6 @@ function Register() {
     e.preventDefault();
     setMensaje("Registrando gimnasio...");
     try {
-      // ✅ Enviamos el formData completo porque los nombres coinciden con el DTO del Backend
-      // (firstName, lastName, email, password, gymName, gymAddress)
       await registerGym(formData);
 
       setMensaje("✅ ¡Gimnasio registrado con éxito! Redirigiendo al login...");
@@ -31,8 +29,7 @@ function Register() {
     } catch (error) {
       console.error("Error en registro:", error);
 
-      // 💡 Tip: Si el backend devuelve un objeto de errores de @Valid,
-      // acá podrías mapearlo. Por ahora mostramos el mensaje general.
+
       const errorMsg = typeof error === 'string' ? error : (error.message || "Datos inválidos");
       setMensaje(`❌ Error: ${errorMsg}`);
     }

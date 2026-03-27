@@ -31,7 +31,7 @@ public class SecurityConfig {
     @Autowired
     private UserRepository userRepository; // Necesitamos el repo para el UserDetailsService
 
-    // 🔴 ESTO ES LO QUE TE FALTABA: Definir cómo buscar al usuario
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
@@ -63,9 +63,10 @@ public class SecurityConfig {
                         // 👥 Socios (Tu permiso temporal de prueba)
                         .requestMatchers("/api/members/**").permitAll()
 
+                        .requestMatchers("/api/payments/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
-                // 🔴 AGREGAMOS EL PROVIDER
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

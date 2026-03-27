@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/payments";
+import { API_BASE_URL } from '../config';
+
+const API_URL = `${API_BASE_URL}/payments`;
 
 export const registerPayment = async (memberId, method, date) => {
   const token = localStorage.getItem('token');
-  // Fijate que acá agregamos &date=${date}
+
   const response = await axios.post(
     `${API_URL}/member/${memberId}?method=${method}&date=${date}`,
     {},

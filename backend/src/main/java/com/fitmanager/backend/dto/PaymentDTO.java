@@ -10,9 +10,9 @@ public class PaymentDTO {
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String paymentMethod;
-    // Datos simplificados del socio
+
     private Long memberId;
     private String memberFullName;
-    // Datos del plan
+
     private String planName;
 }

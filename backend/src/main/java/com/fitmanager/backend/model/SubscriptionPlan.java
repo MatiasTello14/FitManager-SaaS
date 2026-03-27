@@ -13,12 +13,13 @@ public class SubscriptionPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;        // Ej: "Pase Libre", "Crossfit 3 veces", etc.
+    private String name;
     private String description;
-    private BigDecimal price;   // Siempre usar BigDecimal para dinero
-    private Integer durationDays; // Ej: 30 para un mes
+    private BigDecimal price;
+    private Integer durationDays;
+    private boolean active = true;
 
     @ManyToOne
     @JoinColumn(name = "gym_id")
-    private Gym gym; // A qué gimnasio pertenece este plan
+    private Gym gym;
 }

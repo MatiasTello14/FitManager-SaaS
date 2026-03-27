@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> save(@Valid @RequestBody UserDTO userDto) {
         try {
-            // El service ahora procesa el DTO y devuelve un DTO
+
             UserDTO savedUser = userService.createEmployee(userDto);
             return ResponseEntity.ok(savedUser);
         } catch (RuntimeException e) {
@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getGymEmployees(@PathVariable Long gymId) {
         List<User> employees = userService.getUsersByGym(gymId);
 
-        // Convertimos la lista de entidades a DTOs para no filtrar passwords
+
         List<UserDTO> dtos = employees.stream()
                 .map(userMapper::toDTO)
                 .collect(Collectors.toList());

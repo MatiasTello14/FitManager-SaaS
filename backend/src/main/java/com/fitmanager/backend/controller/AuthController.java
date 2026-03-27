@@ -40,10 +40,10 @@ public class AuthController {
     public ResponseEntity<UserDTO> registerOwner(@Valid @RequestBody RegistrationRequestDTO registrationDto) {
         try {
             User newUser = userService.registerGymOwner(registrationDto);
-            // ✅ Devolvemos UserDTO en lugar de la entidad User
+
             return ResponseEntity.ok(userMapper.toDTO(newUser));
         } catch (Exception e) {
-            // Cambiamos el tipo de retorno en el error para que sea consistente
+
             return ResponseEntity.badRequest().build();
         }
     }

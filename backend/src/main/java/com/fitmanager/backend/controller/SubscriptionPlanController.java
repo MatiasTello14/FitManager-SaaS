@@ -40,4 +40,11 @@ public class SubscriptionPlanController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        planService.deletePlan(id);
+        return ResponseEntity.noContent().build(); // Retorna un 204 No Content
+    }
 }

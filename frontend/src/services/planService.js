@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/plans";
+import { API_BASE_URL } from '../config';
+
+const API_URL = `${API_BASE_URL}/plans`;
 
 export const getPlansByGym = async (gymId) => {
     const token = localStorage.getItem('token');
-    console.log("Token enviado en GET:", token); // <-- Debug para ver si existe
 
     return axios.get(`${API_URL}/gym/${gymId}`, {
         headers: {
@@ -16,7 +17,6 @@ export const getPlansByGym = async (gymId) => {
 
 export const createPlan = async (planData, gymId) => {
     const token = localStorage.getItem('token');
-    console.log("Token enviado en POST:", token); // <-- Debug
 
     return axios.post(`${API_URL}?gymId=${gymId}`, planData, {
         headers: {
@@ -24,4 +24,14 @@ export const createPlan = async (planData, gymId) => {
             'Content-Type': 'application/json'
         }
     }).then(res => res.data);
+};
+
+export const deletePlan = async (id) => {
+    const token = localStorage.getItem('token');
+
+    return axios.delete(`${API_URL}/${id}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
 };

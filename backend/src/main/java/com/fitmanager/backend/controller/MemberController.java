@@ -28,7 +28,7 @@ public class MemberController {
                                     @RequestParam Long gymId,
                                     @RequestParam Long planId) {
         try {
-            // El Service ahora recibe el DTO validado
+
             Member newMember = memberService.createMember(memberDto, gymId, planId);
             return ResponseEntity.ok(memberMapper.toDTO(newMember));
         } catch (RuntimeException e) {

@@ -37,7 +37,7 @@ public class PaymentService {
         payment.setAmount(plan.getPrice());
         payment.setPaymentMethod(method);
 
-        // ✅ ESTA ES LA PARTE QUE TE FALTA:
+
         if (dateStr != null && !dateStr.isEmpty()) {
             // Convierte "2026-02-20" en una fecha que Java entiende
             payment.setPaymentDate(java.time.LocalDate.parse(dateStr).atStartOfDay());

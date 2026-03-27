@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GymRepository extends JpaRepository<Gym, Long> {
-    // Aquí se podría agregar métodos personalizados, por ejemplo:
-    // Optional<Gym> findByName(String name);
+
 }

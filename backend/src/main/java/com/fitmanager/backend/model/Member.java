@@ -35,6 +35,5 @@ public class Member {
     @JoinColumn(name = "plan_id")
     private SubscriptionPlan subscriptionPlan; // El socio tiene un plan contratado
 
-    @Transient
     private LocalDate lastPaymentDate;
 }

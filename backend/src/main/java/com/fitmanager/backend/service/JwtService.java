@@ -55,7 +55,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    // 4. El método que te faltaba: Valida si el token es del usuario y está vigente
+    // 4.  Valida si el token es del usuario y está vigente
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

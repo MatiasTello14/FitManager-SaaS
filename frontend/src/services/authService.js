@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/auth";
+import { API_BASE_URL } from '../config';
+
+const API_URL = `${API_BASE_URL}/auth`;
 
 // --- FUNCIÓN DE LOGIN ---
 export const login = async (email, password) => {
@@ -25,11 +27,10 @@ export const login = async (email, password) => {
 // --- FUNCIÓN DE REGISTRO CORREGIDA ---
 export const registerGym = async (registrationData) => {
     try {
-        // Ahora enviamos UN SOLO OBJETO en el body, sin params en la URL
         const response = await axios.post(`${API_URL}/register-gym`, registrationData);
         return response.data;
     } catch (error) {
-        // Importante: Si el @Valid falla, el mensaje de error viene en error.response.data
+
         throw error.response ? error.response.data : new Error("Error al registrar el gimnasio");
     }
 };

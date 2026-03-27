@@ -22,7 +22,7 @@ public class Gym {
     private String address;
 
     @Column(unique = true)
-    private String nit; // Identificador fiscal (opcional)
+    private String nit;
 
     private boolean active = true;
 }

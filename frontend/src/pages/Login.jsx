@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from './services/authService';
+import { login } from '../services/authService';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -8,31 +8,22 @@ function Login() {
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
 
-const manejarLogin = async (e) => {
+  const manejarLogin = async (e) => {
     e.preventDefault();
     setMensaje("Cargando...");
     try {
       const response = await login(email, password);
 
-      // LA CLAVE ESTÁ ACÁ:
-      // Si tu backend ahora devuelve el objeto AuthResponse que planeamos:
-      // response.token, response.gymId, etc.
-
       if (response.token) {
         localStorage.setItem('token', response.token);
       }
-
       if (response.gymId) {
-        localStorage.setItem('gymId', response.gymId);
+        localStorage.setItem('gymId', response.gymId.toString());
         console.log("Gym ID guardado:", response.gymId);
       }
 
       setMensaje("✅ ¡Bienvenido!");
-
-      // Un pequeño delay para que el usuario vea el mensaje de éxito
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 500);
+      navigate('/dashboard');
 
     } catch (error) {
       console.error("Error en login:", error);
@@ -95,5 +86,6 @@ const manejarLogin = async (e) => {
     </div>
   );
 }
+
 
 export default Login;

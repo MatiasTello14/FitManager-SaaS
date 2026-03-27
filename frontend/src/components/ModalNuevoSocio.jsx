@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { createMember, updateMember } from './services/memberService';
-import { getPlansByGym } from './services/planService';
+import { createMember, updateMember } from '../services/memberService';
+import { getPlansByGym } from '../services/planService';
 
 const getTodayDate = () => {
   const hoy = new Date();
-  // Esto ajusta la fecha a tu zona horaria local antes de convertirla a string
   const offset = hoy.getTimezoneOffset() * 60000;
-  const localISOTime = (new Date(hoy - offset)).toISOString().split('T')[0];
-  return localISOTime; // Retorna "2026-03-25" exacto
+  return (new Date(hoy - offset)).toISOString().split('T')[0];
 };
 
 function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId }) {
@@ -17,32 +15,45 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
     dni: '',
     email: '',
     subscriptionPlanId: '',
-    registrationDate: getTodayDate() // <-- Fecha por defecto
+    registrationDate: getTodayDate()
   });
   const [planes, setPlanes] = useState([]);
+  const [planInactivoDetectado, setPlanInactivoDetectado] = useState(false);
 
-  // 1. Cargar planes usando la prop gymId
   useEffect(() => {
     if (isOpen && gymId) {
       const cargarPlanes = async () => {
         try {
           const data = await getPlansByGym(gymId);
           setPlanes(data);
+
+          // Lógica de validación para socios editados
+          if (socioAEditar) {
+            const planIdActual = socioAEditar.subscriptionPlan?.id;
+            // Verificamos si el plan del socio está en la lista de planes ACTIVOS
+            const elPlanSigueActivo = data.some(p => p.id === planIdActual);
+
+            if (planIdActual && !elPlanSigueActivo) {
+              setPlanInactivoDetectado(true);
+
+              setFormData(prev => ({ ...prev, subscriptionPlanId: '' }));
+            } else {
+              setPlanInactivoDetectado(false);
+              setFormData(prev => ({ ...prev, subscriptionPlanId: planIdActual || '' }));
+            }
+          }
         } catch (error) {
           console.error("Error al traer planes:", error);
         }
       };
       cargarPlanes();
     }
-  }, [isOpen, gymId]);
+  }, [isOpen, gymId, socioAEditar]);
 
-  // 2. Cargar datos si es edición o resetear si es nuevo
   useEffect(() => {
     if (socioAEditar) {
       setFormData({
         ...socioAEditar,
-        subscriptionPlanId: socioAEditar.subscriptionPlan?.id || '',
-        // Si el socio ya tiene fecha, la usamos, sino hoy
         registrationDate: socioAEditar.registrationDate || getTodayDate()
       });
     } else {
@@ -52,8 +63,9 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
         dni: '',
         email: '',
         subscriptionPlanId: '',
-        registrationDate: getTodayDate() // <-- Reset a hoy
+        registrationDate: getTodayDate()
       });
+      setPlanInactivoDetectado(false);
     }
   }, [socioAEditar, isOpen]);
 
@@ -61,10 +73,8 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
     e.preventDefault();
     try {
       if (socioAEditar) {
-        // Para editar, enviamos los datos actualizados
         await updateMember(socioAEditar.id, formData);
       } else {
-        // Para crear, usamos el gymId que recibimos del Dashboard
         await createMember(formData, gymId, formData.subscriptionPlanId);
       }
       onSocioGuardado();
@@ -79,9 +89,16 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all">
-        <h2 className="text-2xl font-bold mb-6 text-blue-500">
+        <h2 className="text-2xl font-bold mb-2 text-blue-500">
           {socioAEditar ? 'Editar Socio' : 'Nuevo Socio'}
         </h2>
+
+
+        {planInactivoDetectado && (
+          <p className="text-amber-400 text-xs font-bold mb-4 bg-amber-400/10 p-2 rounded border border-amber-400/20">
+            ⚠️ El plan anterior de este socio fue eliminado. Por favor, asigne un nuevo plan vigente.
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -101,19 +118,26 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
             />
           </div>
 
-          <select
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 text-slate-300"
-            value={formData.subscriptionPlanId}
-            onChange={(e) => setFormData({...formData, subscriptionPlanId: e.target.value})}
-            required
-          >
-            <option value="">Seleccionar Plan...</option>
-            {planes.map(plan => (
-              <option key={plan.id} value={plan.id}>
-                {plan.name} - ${plan.price.toLocaleString('es-AR')}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-slate-400 ml-1">Plan de Suscripción</label>
+            <select
+              className={`w-full bg-slate-900 border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 text-slate-300 ${planInactivoDetectado ? 'border-amber-500 animate-pulse' : 'border-slate-700'}`}
+              value={formData.subscriptionPlanId}
+              onChange={(e) => {
+                setFormData({...formData, subscriptionPlanId: e.target.value});
+                setPlanInactivoDetectado(false); // Se limpia el aviso al elegir uno nuevo
+              }}
+              required
+            >
+              <option value="">Seleccionar Plan Vigente...</option>
+              {planes.map(plan => (
+                <option key={plan.id} value={plan.id}>
+                  {plan.name} - ${plan.price.toLocaleString('es-AR')}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           <input
             type="text" placeholder="DNI"
@@ -143,17 +167,10 @@ function ModalNuevoSocio({ isOpen, onClose, onSocioGuardado, socioAEditar, gymId
           />
 
           <div className="flex gap-3 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-bold transition-colors"
-            >
+            <button type="button" onClick={onClose} className="flex-1 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-bold transition-colors">
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition-all shadow-lg shadow-blue-900/20"
-            >
+            <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition-all shadow-lg shadow-blue-900/20">
               {socioAEditar ? 'Actualizar' : 'Guardar'}
             </button>
           </div>
