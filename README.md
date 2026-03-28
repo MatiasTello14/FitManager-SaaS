@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/ff1f4e38-d7cb-47ef-bec3-87a6f78481bf
 
 ## 📺 Demo Visual
 
-https://github.com/user-attachments/assets/89fb8504-fffa-4318-8e57-d3d2ce1fd728
+https://github.com/user-attachments/assets/84b4e6fd-5942-4b9b-8913-b5c744278a3a
 
 
 ---
