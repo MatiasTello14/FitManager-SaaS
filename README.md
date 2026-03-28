@@ -5,11 +5,14 @@ FitManager es una solución **Full Stack** diseñada para digitalizar la adminis
 
 ### 🔐 Registro de nuevos Gimnasios
 
-> https://github.com/user-attachments/assets/8891064c-78e3-4e01-9b4b-5fae1812fd9e
+https://github.com/user-attachments/assets/ff1f4e38-d7cb-47ef-bec3-87a6f78481bf
+
+
 
 ## 📺 Demo Visual
 
->  https://github.com/user-attachments/assets/6c9dc1d5-3cfd-4781-bcf1-5b58e16c1411
+https://github.com/user-attachments/assets/89fb8504-fffa-4318-8e57-d3d2ce1fd728
+
 
 ---
 
